@@ -1,0 +1,68 @@
+\name{plot.SiZer}
+\alias{plot.SiZer}
+
+\title{Plot a SiZer map}
+
+\description{
+Plot a \code{SiZer} object that was created using \code{SiZer()}.
+}
+
+\usage{
+## S3 method for class 'SiZer'.
+\method{plot}{SiZer}(x, ylab = expression(log[10](h)), colorlist = c("red", "purple", "blue", "grey"), ...)
+}
+
+\arguments{
+  \item{x}{An object created using \code{SiZer()}}
+  \item{ylab}{What the y-axis should be labled.}
+  \item{colorlist}{What colors should be used.  This is a vector that corresponds to 'decreasing', 
+		'possibley zero', 'increasing', 'insufficient data'}
+  \item{\dots}{Any other parameters to be passed to the function \code{image}.}
+}
+
+\value{
+None
+}
+
+\details{
+The white lines in the SiZer map give a graphical representation of the bandwidth.  The horizontal
+distance between the lines is \eqn{2h}.
+}
+
+\references{
+Chaudhuri, P., and J. S. Marron. 1999. SiZer for exploration of structures 
+	in curves. Journal of the American Statistical Association 94:807-823. 
+
+Hannig, J., and J. S. Marron. 2006. Advanced distribution theory for SiZer. 
+	Journal of the American Statistical Association 101:484-499.
+
+Sonderegger, D., Wang, H., Clements, W. H., and Noon, B. R. 2008. Using 
+	SiZer to detect thresholds in ecological data.  Frontiers in Ecology
+	and the Environment To Appear.
+}
+
+\author{Derek Sonderegger}
+
+\seealso{\code{\link{plot.SiZer}}, \code{\link{locally.weighted.polynomial}}}
+
+\examples{
+data('Arkansas')
+x <- Arkansas$year
+y <- Arkansas$sqrt.mayflies
+
+# Calculate the SiZer map for the first derivative
+SiZer.1 <- SiZer(x, y, h=c(.5,10), degree=1, derv=1)
+plot(SiZer.1)
+
+# Calculate the SiZer map for the second derivative
+SiZer.2 <- SiZer(x, y, h=c(.5,10), degree=2, derv=2);
+plot(SiZer.2)
+
+# By setting the grid.length larger, we get a more detailed SiZer
+# map but it takes longer to compute. 
+SiZer.3 <- SiZer(x, y, h=c(.5,10), grid.length=100, degree=1, derv=1)
+plot(SiZer.3)
+}
+
+\keyword{hplot}
+\keyword{smooth}
