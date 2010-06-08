@@ -41,9 +41,12 @@ plot.SiZer <- function(x, ylab=expression(log[10](h)), colorlist=c('red', 'purpl
 	if( is.element( '2', levels(temp) ) )
 	   final.colorlist <- c(final.colorlist, colorlist[4]);
 
-	image( x$x.grid, log(x$h.grid,10), t(x$slopes), 
-			col=final.colorlist, ylab=ylab, ... );
-		              
+	# Convert the slopes to a factor list to match up with final.colorlist
+	temp <- matrix( as.integer(factor(x$slopes)), nrow=dim(x$slopes)[1] ) 
+
+	image( x$x.grid, log(x$h.grid,10), t(temp), 
+			col=final.colorlist, ylab=ylab, ...)
+			
     # draw the bandwidth lines
     x.midpoint <- diff(range(x$x.grid))/2 + min(x$x.grid);
     lines( x.midpoint + x$h.grid, log(x$h.grid, 10), col='white' );

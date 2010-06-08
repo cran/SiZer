@@ -64,9 +64,7 @@ Chaudhuri, P., and J. S. Marron. 1999. SiZer for exploration of structures
 Hannig, J., and J. S. Marron. 2006. Advanced distribution theory for SiZer. 
 	Journal of the American Statistical Association 101 484-499.
 
-Sonderegger, D., Wang, H., Clements, W. H., and Noon, B. R. 2008. Using 
-	SiZer to detect thresholds in ecological data.  Frontiers in Ecology
-	and the Environment To Appear.
+Sonderegger, D.L., Wang, H., Clements, W.H., and Noon, B.R. 2009. Using SiZer to detect	thresholds in ecological data. Frontiers in Ecology and the Environment 7:190-195
 }
 
 \seealso{\code{\link{SiZer}}, \code{\link{plot.LocallyWeightedPolynomial}},  \code{spm} in package 'SemiPar',

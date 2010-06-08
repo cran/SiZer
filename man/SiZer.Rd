@@ -52,9 +52,7 @@ Chaudhuri, P., and J. S. Marron. 1999. SiZer for exploration of structures
 Hannig, J., and J. S. Marron. 2006. Advanced distribution theory for SiZer. 
 	Journal of the American Statistical Association 101:484-499.
 
-Sonderegger, D., Wang, H., Clements, W. H., and Noon, B. R. 2008. Using 
-	SiZer to detect thresholds in ecological data.  Frontiers in Ecology
-	and the Environment To Appear.
+Sonderegger, D.L., Wang, H., Clements, W.H., and Noon, B.R. 2009. Using SiZer to detect	thresholds in ecological data. Frontiers in Ecology and the Environment 7:190-195.
 }
 
 \author{Derek Sonderegger}
@@ -78,8 +76,9 @@ plot(SiZer.2)
 
 # By setting the grid.length larger, we get a more detailed SiZer
 # map but it takes longer to compute. 
-SiZer.3 <- SiZer(x, y, h=c(.5,10), grid.length=100, degree=1, derv=1)
-plot(SiZer.3)
+#
+# SiZer.3 <- SiZer(x, y, h=c(.5,10), grid.length=100, degree=1, derv=1)
+# plot(SiZer.3)
 }
 
 \keyword{hplot}
