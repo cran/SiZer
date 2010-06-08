@@ -41,20 +41,21 @@ Sonderegger, D.L., Wang, H., Clements, W.H., and Noon, B.R. 2009. Using SiZer to
 
 \author{Derek Sonderegger}
 
-\seealso{\code{\link{plot.SiZer}}, \code{\link{locally.weighted.polynomial}}}
+\seealso{\code{\link{SiZer}}, 
+	\code{\link{locally.weighted.polynomial}}}
 
 \examples{
-data('Arkansas')
-x <- Arkansas$year
-y <- Arkansas$sqrt.mayflies
+# data('Arkansas')
+# x <- Arkansas$year
+# y <- Arkansas$sqrt.mayflies
 
 # Calculate the SiZer map for the first derivative
-SiZer.1 <- SiZer(x, y, h=c(.5,10), degree=1, derv=1)
-plot(SiZer.1)
+# SiZer.1 <- SiZer(x, y, h=c(.5,10), degree=1, derv=1)
+# plot(SiZer.1)
 
 # Calculate the SiZer map for the second derivative
-SiZer.2 <- SiZer(x, y, h=c(.5,10), degree=2, derv=2);
-plot(SiZer.2)
+# SiZer.2 <- SiZer(x, y, h=c(.5,10), degree=2, derv=2);
+# plot(SiZer.2)
 
 # By setting the grid.length larger, we get a more detailed SiZer
 # map but it takes longer to compute. 

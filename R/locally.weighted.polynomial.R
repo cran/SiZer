@@ -58,72 +58,83 @@ locally.weighted.polynomial <- function(x, y, h=NA, x.grid=NA, degree=1, kernel.
                                                            # 2nd row is slope, beta[1]
                                                            # 3rd row is beta[2]  : 
                                                            #    2nd derivative = beta[2] * 2!
-											               #    3rd derivative = beta[3] * 3!			
-  unscaled.var  <- out$Beta;         # Calculating the Variance for the Beta vector will be a 2 step process
-  out$Beta.var      <- out$Beta;     # We'll store part while finding f.hat(Y|X), and then use the residuals to get Var(Beta|X)
-  var.y.given.x <- rep(0, length(x.grid) ); 
+											                               #    3rd derivative = beta[3] * 3!
+												
+	unscaled.var  <- out$Beta;	# Calculating the Variance for the Beta vector will be a 2 step process
+	out$Beta.var  <- out$Beta;	# We'll store part while finding f.hat(Y|X), and then use the 
+												# residuals to get Var(Beta|X)
+	var.y.given.x <- rep(0, length(x.grid) ); 
 
   # index denoting what where we are in the array x.grid
   count <- 1;
 
   for(x.star in x.grid){
      # figure out the X matrix
- 	 X <- NULL;
-     for( i in 0:degree ){
-       X <- cbind(X, (x-x.star)^i );
-     }
+		X <- NULL;
+		for( i in 0:degree ){
+			X <- cbind(X, (x-x.star)^i );
+		}
      
      # find the weight vector
      w <- kernel.h(x-x.star, h, type=kernel.type);
      w2 <- w^2;
      XtW  <- t( apply(X,2,function(x){x*w}) );           # XtW <- t(X) %*% diag(w)   computed faster.  :) 
      XtW2 <- t( apply(X,2,function(x){x*w2}) );          # XtW2 <- t(X) %*% diag(w^2) 
-     XtWXinv <- try( solve( XtW %*% X ) );
-     if( class(XtWXinv) == 'try-error' ){                # inverse failed!  Could be any of a bunch of legitimate reasons such 
-        out$Beta[, count] <- rep(NA, degree);            # as a really small bandwidth.  So just record NAs and don't throw any   
-        unscaled.var[j, count] <- rep(NA, degree);   # warnings or errors.   
+     XtWXinv <- try( solve( XtW %*% X ), silent=TRUE );
+     if( class(XtWXinv) == 'try-error' ){            # inverse failed!  Could be any of a 
+     		out$Beta[, count] <- rep(NA, degree+1);      # bunch of legitimate reasons such 
+        unscaled.var[, count] <- rep(NA, degree+1);  # as a really small bandwidth.  So just 
+                                                     # record NAs and don't throw any warnings or errors.   
      }else{
-     	beta <- XtWXinv %*% XtW %*% y;
+     		beta <- XtWXinv %*% XtW %*% y;
         out$Beta[,count] <- beta;
         unscaled.var[,count] <- diag(XtWXinv %*% XtW2%*%X %*% t(XtWXinv));         
-                                                 # Var(Beta_j) = ((XtWX)^{-1}(XtW2X)(XtWX)^-1)[j,j] * Var(Y|X=x.star) 
+                                                 # Var(Beta_j) = ((XtWX)^{-1}(XtW2X)(XtWX)^-1)[j,j] * 
+                                                 #                Var(Y|X=x.star) 
                                                  # but we don't know
      }                                           # Var(Y|X) yet so just store the diagonal terms.
      count <- count+1;
   } 
 
-  # At this point we have calculated the Beta coefficients at each grid point.  Now we need the 
-  # variance estimates.
+	# At this point we have calculated the Beta coefficients at each grid point.  Now we need the 
+	# variance estimates.
   
-  # first get the residuals by interpolating along the grid points
-  interp <- interpSpline(x.grid, out$Beta[1,]);
-  out$residuals <- y - predict(interp, x)$y;
+	# first get the residuals by interpolating along the grid points
+	index <- which(!is.na(out$Beta[1,]))
+	if(length(index) > 2 ){
+		x.grid.small <- x.grid[index]
+		interp <- interpSpline(x.grid.small, out$Beta[1,index])
+		out$residuals <- y - predict(interp, x)$y
     
-
-  # Var(Y|X=x) = ( sum_{j=1}^n  e_j^2 * K_h(x-X_j) )    /   ( sum_{j=1}^n K_h(x-X_j) )  from Chaudhuri and Marron 1999
-  for(i in 1:length(x.grid) ){
-    divisor <- 0;
-  	for(j in 1:length(x)){
-  	  kernel <- kernel.h(x.grid[i]-x[j], h, type=kernel.type);
- 	  var.y.given.x[i] <- var.y.given.x[i] + (out$residuals[j])^2 * kernel;
- 	  divisor <- divisor + kernel;
- 	}
- 	var.y.given.x[i] <- var.y.given.x[i] / divisor;
-  }
-
-  # calculate the effective sample size
-  for( i in 1:length(x.grid) ){
-     sum <- 0;
-  	 for( j in 1:length(x) ){
-  	 	sum <- sum + kernel.h(x.grid[i] - x[j], h, type=kernel.type);
-  	 }
-  	 out$effective.sample.sizes[i] <- sum / kernel.h(0, h, type=kernel.type);
-  }	 
+		# Var(Y|X=x) = ( sum_{j=1}^n  e_j^2 * K_h(x-X_j) )    /   
+		#        ( sum_{j=1}^n K_h(x-X_j) )  from Chaudhuri and Marron 1999
+		for(i in 1:length(x.grid.small) ){
+			divisor <- 0
+  			for(j in 1:length(x)){
+				kernel <- kernel.h(x.grid.small[i]-x[j], h, type=kernel.type)
+				var.y.given.x[i] <- var.y.given.x[i] + (out$residuals[j])^2 * kernel
+				divisor <- divisor + kernel
+ 			}
+			var.y.given.x[i] <- var.y.given.x[i] / divisor;
+		}
+	}
+	index <- which(var.y.given.x == 0)
+	var.y.given.x[index] <- NA
+	
+	
+	# calculate the effective sample size
+	for( i in 1:length(x.grid) ){
+		sum <- 0;
+		for( j in 1:length(x) ){
+			sum <- sum + kernel.h(x.grid[i] - x[j], h, type=kernel.type);
+		}
+		out$effective.sample.sizes[i] <- sum / kernel.h(0, h, type=kernel.type);
+	}	 
   
-  # now we know everything for calculating the variance of the Beta values
-  for( i in 1:length(x.grid) ){
-  	out$Beta.var[, i] <- unscaled.var[,i] * var.y.given.x[i];
-  }
+	# now we know everything for calculating the variance of the Beta values
+	for( i in 1:length(x.grid) ){
+		out$Beta.var[, i] <- unscaled.var[,i] * var.y.given.x[i];
+	}
   
   class(out) <- 'LocallyWeightedPolynomial';       # set the out object to have the right label
   return(out);

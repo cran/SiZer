@@ -9,15 +9,16 @@ SiZer <- function(x, y, h=NA, x.grid=NA, degree=NA, derv=1, grid.length=41){
   	 degree = derv+1;
   }
   
-  row <- 1;
-  slopes <- matrix(nrow=length(h.grid), ncol=length(x.grid));
-  for( h in h.grid ){
-  	model <- locally.weighted.polynomial(x, y, h=h, x.grid=x.grid, degree=degree);     
-  	intervals <- 
+	row <- 1;
+	slopes <- matrix(nrow=length(h.grid), ncol=length(x.grid));
+	for( h in h.grid ){
+		print(h)
+		model <- locally.weighted.polynomial(x, y, h=h, x.grid=x.grid, degree=degree);     
+  		intervals <- 
   	      calc.CI.LocallyWeightedPolynomial(model, derv=derv);
-  	slopes[row,] <- find.states(intervals);         
-    row <- row + 1;
-  }
+  		slopes[row,] <- find.states(intervals);         
+		row <- row + 1;
+	}
 
   out <- NULL;
   out$x.grid <- x.grid;
@@ -29,7 +30,8 @@ SiZer <- function(x, y, h=NA, x.grid=NA, degree=NA, derv=1, grid.length=41){
 
 
 
-plot.SiZer <- function(x, ylab=expression(log[10](h)), colorlist=c('red', 'purple', 'blue', 'grey'), ...){	
+plot.SiZer <- function(x, ylab=expression(log[10](h)), 
+			colorlist=c('red', 'purple', 'blue', 'grey'), ...){
 	temp <- factor(x$slopes);
     final.colorlist <- NULL;
 	if( is.element( '-1', levels(temp) ) )
