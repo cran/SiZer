@@ -1,0 +1,15 @@
+02aebdaad9dca58daec2c326c120d5b9 *DESCRIPTION
+8591cb384fd0aac92b95a888e1cf1e41 *INDEX
+7538f4bf5141536dc71d306afc47a9cc *NAMESPACE
+b4a6ae51b8e76df25358bec5df0ed603 *R/SiZer.R
+a3d6980c65cfac9d842d3fff9d2a3776 *R/bent.cable.R
+11863e024775038900743cb133cda96c *R/locally.weighted.polynomial.R
+43134e0ae08e0fc58434f4bccbcfaa16 *R/piecewise.linear.R
+e633744efbcffb3f8addd9c250fbfde7 *data/Arkansas.RData
+89e2e95b869ea1a3dbbff6e8c4c987b1 *man/Arkansas.Rd
+d41bd5e1c2aee4d95e203f9844838d0c *man/SiZer.Rd
+ba59b64ae20562641566367d16510ede *man/bent.cable.Rd
+e40d5de63abc9f9387a2ebc8b6510e74 *man/locally.weighted.polynomial.Rd
+7fb1bf3e6d62c94bbe02d5249bac4ead *man/piecewise.linear.Rd
+7b60879303b7ed95005553ade91791e7 *man/plot.LocallyWeightedPolynomial.Rd
+7b8f5eb344b6bc705ae32f5bfa75cf0e *man/plot.SiZer.Rd

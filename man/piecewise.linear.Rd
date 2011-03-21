@@ -15,7 +15,8 @@ knot point is unknown.
 }
 
 \usage{
-piecewise.linear(x, y, middle = 1, CI = FALSE, bootstrap.samples = 1000, sig.level = 0.05)
+piecewise.linear(x, y, middle = 1, CI = FALSE, 
+	bootstrap.samples = 1000, sig.level = 0.05)
 }
 
 \arguments{

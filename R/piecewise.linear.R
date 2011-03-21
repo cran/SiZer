@@ -94,8 +94,8 @@ print.PiecewiseLinear <- function(x, ...){
   }
 }
 
-plot.PiecewiseLinear <- function(x, ...){
-	plot(x$model$model$x, x$model$model$y, xlab='X', ylab='Y');
+plot.PiecewiseLinear <- function(x, xlab='X', ylab='Y', ...){
+	plot(x$model$model$x, x$model$model$y, xlab=xlab, ylab=ylab, ...);
 	lines(x$x, x$y, col='red');
 }
 

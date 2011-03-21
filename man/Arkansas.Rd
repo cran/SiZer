@@ -22,7 +22,7 @@ monitoring station AR1.
 
 
 \source{
-Sonderegger et. al.
+Sonderegger, D.L., Wang, H., Clements, W.H., and Noon, B.R. 2009. Using SiZer to detect	thresholds in ecological data. Frontiers in Ecology and the Environment 7:190-195.
 }
 
 \examples{

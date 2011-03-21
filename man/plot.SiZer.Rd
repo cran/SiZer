@@ -9,7 +9,8 @@ Plot a \code{SiZer} object that was created using \code{SiZer()}.
 
 \usage{
 ## S3 method for class 'SiZer'.
-\method{plot}{SiZer}(x, ylab = expression(log[10](h)), colorlist = c("red", "purple", "blue", "grey"), ...)
+\method{plot}{SiZer}(x, ylab = expression(log[10](h)), 
+	colorlist = c("red", "purple", "blue", "grey"), ...)
 }
 
 \arguments{

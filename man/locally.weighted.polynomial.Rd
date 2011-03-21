@@ -15,7 +15,8 @@ Smoothes the given bivariate data using kernel regression.
 }
 
 \usage{
-locally.weighted.polynomial(x, y, h = NA, x.grid = NA, degree = 1, kernel.type = "Normal")
+locally.weighted.polynomial(x, y, h = NA, x.grid = NA, 
+	degree = 1, kernel.type = "Normal")
 }
 
 %- maybe also 'usage' for other objects documented here.
