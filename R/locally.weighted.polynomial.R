@@ -1,44 +1,76 @@
-#library('splines');
-
-#######################################################################
-#  locally.weighted.polynomial
-#######################################################################
-# Computes the locally weighted polynomial smoothing of the given data
-#######################################################################
-# Inputs:
-# x, y        - bivariate data vectors to be smoothed
-# x.grid      - either NA, an integer, or a vector.  If NA, then a default number (41)
-#               of grid points is used, spread evenly across the range of the x-vector.
-#               If an integer, it designates how many grid points are used, again spread
-#               evenly across the range of the x-vector.  If x.grid is a vector, we just
-#               use what is given
-# h           - The smoothing bandwidth to use, in terms of standard deviations
-# degree      - the degree of polynomial that is fit locally, the default is to fit
-#               a linear function, ie degree=1
-# kernel.type - The shape of the kernal function.  Acceptable values are, 'Normal',
-#               'Epanechnikov', 'biweight', and 'triweight'
-#######################################################################
-# Outputs:
-# data   - a structure of the data used to generate the smoothing curve
-# h      - the bandwidth used to generate the smoothing curve
-# x.grid - the grid of x-values that we have estimated function value
-#          and derivative(s) for
-# degrees.freedom - the effective sample size at each grid point
-# Beta   - a matrix of estimated beta values.  The number of rows is
-#          degrees+1, while the number of columns is the same as the length
-#          of x.grid.
-#          Notice that hat{f}(x_i) = Beta[1,i]
-#                      hat{f'}(x_i) = Beta[2,i]*1!
-#                      hat{f''}(x_i) = Beta[3,i]*2!  and so on...
-# Beta.var - matrix of estimated variances for Beta.  Same structure dimensions.
-#############################################################################
+#' Smoothes the given bivariate data using kernel regression.
+#' 
+#' @param x Vector of data for the independent variable
+#' @param y Vector of data for the dependent variable
+#' @param h The bandwidth for the kernel
+#' @param x.grid What x-values should the value of the smoother be calculated at.
+#' @param degree The degree of the polynomial to be fit at each x-value. The default 
+#'               is to fit a linear regression, ie degree=1.
+#' @param kernel.type What kernel to use.  Valid choices are 'Normal',
+#'                    'Epanechnikov', 'biweight', and 'triweight'.
+#'                    
+#' @details The confidence intervals are created using the row-wise method of 
+#'          Hannig and Marron (2006).
+#' 
+#'          Notice that the derivative to be estimated must be less than or equal to 
+#'          the degree of the polynomial initially fit to the data.
+#'          
+#'          If the bandwidth is not given, the Sheather-Jones bandwidth selection method is used.
+#' 
+#' @return Returns a \code{LocallyWeightedPolynomial} object that has the following elements:
+#'   \describe{
+#'   \item{data}{A structure of the data used to generate the smoothing curve}
+#'   \item{h}{The bandwidth used to generate the smoothing curve.}
+#'   \item{x.grid}{The grid of x-values that we have estimated function value 
+#'        and derivative(s) for.}
+#'   \item{degrees.freedom}{The effective sample size at each grid point}
+#'   \item{Beta}{A matrix of estimated beta values.  The number of rows is
+#'         degrees+1, while the number of columns is the same as the length
+#'         of x.grid. Notice that 
+#'         \deqn{ \hat{f}(x_i)   = \beta[1,i] }
+#'         \deqn{ \hat{f'}(x_i)  = \beta[2,i]*1! }
+#'         \deqn{ \hat{f''}(x_i) = \beta[3,i]*2! }  
+#'         and so on...}
+#'   \item{Beta.var}{Matrix of estimated variances for \code{Beta}.  Same structure as \code{Beta}.}
+#'   }
+#'   
+#' @author Derek Sonderegger
+#' @references 
+#' Chaudhuri, P., and J. S. Marron. 1999. SiZer for exploration of structures in curves. 
+#'   Journal of the American Statistical Association 94 807-823. 
+#'   
+#' Hannig, J., and J. S. Marron. 2006. Advanced distribution theory for SiZer. 
+#'   Journal of the American Statistical Association 101 484-499.
+#'   
+#' Sonderegger, D.L., Wang, H., Clements, W.H., and Noon, B.R. 2009. Using SiZer to detect
+#'   thresholds in ecological data. Frontiers in Ecology and the Environment 7:190-195
+#'   
+#' @seealso \code{\link{SiZer}}, \code{\link{plot.LocallyWeightedPolynomial}},  
+#'   \code{spm} in package 'SemiPar', \code{\link{loess}}, \code{\link{smooth.spline}}, 
+#'   \code{\link{interpSpline}} in the \code{splines} package. 
+#'   
+#' @examples 
+#' data(Arkansas)
+#' x <- Arkansas$year
+#' y <- Arkansas$sqrt.mayflies
+#' layout(cbind(1,2,3))
+#' model <- locally.weighted.polynomial(x,y)
+#' plot(model, main='Smoothed Function', xlab='Year', ylab='Sqrt.Mayflies')
+#' 
+#' model2 <- locally.weighted.polynomial(x,y,h=.5)
+#' plot(model2, main='Smoothed Function', xlab='Year', ylab='Sqrt.Mayflies')
+#' 
+#' model3 <- locally.weighted.polynomial(x,y, degree=1)
+#' plot(model3, derv=1, main='First Derivative', xlab='Year', ylab='1st Derivative')
+#' 
+#' @export
 locally.weighted.polynomial <- function(x, y, h=NA, x.grid=NA, degree=1, kernel.type='Normal'){
 
   # convert whatever we were sent in to a valid grid.  If sent a valid grid, we'll keep it
   x.grid <- x.grid.create(x.grid, x,y);
   
   if(is.na(h)){
-    h <- bw.SJ(x);
+    h <- stats::bw.SJ(x);
   }
   
   # set up the output data structure
@@ -103,8 +135,8 @@ locally.weighted.polynomial <- function(x, y, h=NA, x.grid=NA, degree=1, kernel.
 	index <- which(!is.na(out$Beta[1,]))
 	if(length(index) > 2 ){
 		x.grid.small <- x.grid[index]
-		interp <- interpSpline(x.grid.small, out$Beta[1,index])
-		out$residuals <- y - predict(interp, x)$y
+		interp <- splines::interpSpline(x.grid.small, out$Beta[1,index])
+		out$residuals <- y - stats::predict(interp, x)$y
     
 		# Var(Y|X=x) = ( sum_{j=1}^n  e_j^2 * K_h(x-X_j) )    /   
 		#        ( sum_{j=1}^n K_h(x-X_j) )  from Chaudhuri and Marron 1999
@@ -142,6 +174,20 @@ locally.weighted.polynomial <- function(x, y, h=NA, x.grid=NA, degree=1, kernel.
 
 
 
+#' Creates a plot of an object created by \code{locally.weighted.polynomial}.
+#' 
+#' @param x LocallyWeightedPolynomial object
+#' @param derv Derivative to be plotted.  Default is 0 - which plots the smoothed function.
+#' @param CI.method What method should be used to calculate the confidence interval about the estimated line.  
+#'                  The methods are from Hannig and Marron (2006), where 1 is the point-wise estimate, and 2 is 
+#'                  the row-wise estimate.
+#' @param alpha The alpha level such that the CI has a 1-alpha/2 level of significance.
+#' @param use.ess ESS stands for the estimated sample size.  If at any point along the x-axis, the ESS is 
+#'                too small, then we will not plot unless use.ess=FALSE.
+#' @param draw.points Should the data points be included in the graph? Defaults to TRUE.
+#' @param \dots Additional arguments to be passed to the graphing functions.
+#' 
+#' @export
 plot.LocallyWeightedPolynomial <- function(x, derv=0, CI.method=2, alpha=.05, use.ess=TRUE, draw.points=TRUE, ...){
    index <- derv+1;
    intervals <- calc.CI.LocallyWeightedPolynomial(x, derv=derv, CI.method, alpha=alpha, use.ess);
@@ -163,27 +209,27 @@ plot.LocallyWeightedPolynomial <- function(x, derv=0, CI.method=2, alpha=.05, us
    x.M <- temp[2];
 
    # set up the plot device to be the right size
-   plot( c(x.m, x.M), c(y.m, y.M), type='n', ...);
+   graphics::plot( c(x.m, x.M), c(y.m, y.M), type='n', ...);
 
    # draw the confidence interval lines
-   lines(x$x.grid, intervals$upper.CI );
-   lines(x$x.grid, intervals$lower.CI );
+   graphics::lines(x$x.grid, intervals$upper.CI );
+   graphics::lines(x$x.grid, intervals$lower.CI );
    
    # Shade in between the CI bands
-   polygon(c(x$x.grid, rev(x$x.grid)), c(intervals$upper.CI, rev(intervals$lower.CI)),
+   graphics::polygon(c(x$x.grid, rev(x$x.grid)), c(intervals$upper.CI, rev(intervals$lower.CI)),
            col='light grey');
 
    # draw the middle line (do it after shading otherwise shading is on top)
-   lines(x$x.grid, intervals$estimated, type='l', lwd=2);
+   graphics::lines(x$x.grid, intervals$estimated, type='l', lwd=2);
 
    # If we are plotting a derivative, then put a horizontal line at zero
    if(derv >= 1){
-   	 lines( range(x$x.grid), c(0,0) );
+   	 graphics::lines( range(x$x.grid), c(0,0) );
    }
 
    # if we should display the data points
    if( derv==0 & draw.points == TRUE ){
-      points(x$data$x, x$data$y, ...);
+      graphics::points(x$data$x, x$data$y, ...);
    }
 
 }
@@ -201,7 +247,7 @@ calc.CI.LocallyWeightedPolynomial <- function(model, derv=0, CI.method=2, alpha=
 
    # Pointwise intervals
    if( CI.method == 1 ){
-	   t.star <- qt(1-alpha/2, df=model$degrees.freedom);   # this is a vector!
+	   t.star <- stats::qt(1-alpha/2, df=model$degrees.freedom);   # this is a vector!
        out$estimated <- model$Beta[index,];
        out$lower.CI <- out$estimated - t.star*sqrt( model$Beta.var[index,] );
        out$upper.CI <- out$estimated + t.star*sqrt( model$Beta.var[index,] );           
@@ -211,8 +257,8 @@ calc.CI.LocallyWeightedPolynomial <- function(model, derv=0, CI.method=2, alpha=
    	   g <- length(model$x.grid);
    	   h <- model$h;
    	   delta <- model$x.grid[2] - model$x.grid[1];
-   	   theta <- 2* pnorm( sqrt((1+2*derv)*log(g)) * delta/(2*h) ) -1; 
-   	   temp.star <- qnorm( (1-alpha/2)^(1/(theta*g)) );
+   	   theta <- 2* stats::pnorm( sqrt((1+2*derv)*log(g)) * delta/(2*h) ) -1; 
+   	   temp.star <- stats::qnorm( (1-alpha/2)^(1/(theta*g)) );
        out$estimated <- model$Beta[index,] * factorial(derv);
        out$lower.CI <- out$estimated - temp.star*sqrt(model$Beta.var[index,]) * factorial(derv);
        out$upper.CI <- out$estimated + temp.star*sqrt(model$Beta.var[index,]) * factorial(derv);
@@ -230,7 +276,7 @@ calc.CI.LocallyWeightedPolynomial <- function(model, derv=0, CI.method=2, alpha=
 
 kernel.h <- function(x, h, type='Normal'){
 	if(type == 'Normal'){
-		out <- dnorm(x/h) / h;
+		out <- stats::dnorm(x/h) / h;
 	}else if(type == 'Epanechnikov'){
         out <- (1/beta(.5,2)) * ( positive.part( (1-(x/h)^2) ) );
 	}else if( type == 'biweight' ){
@@ -302,7 +348,8 @@ find.state.changes <- function(intervals){
           count <- count + 1;
           lower.CI <- lower.CI[ -1*1:(index-1) ];
           upper.CI <- upper.CI[ -1*1:(index-1) ];
-          out$state[count] <- find.state(lower.CI[1], upper.CI[1]);           	      out$indices[count] <- out$indices[count-1] + index - 1;
+          out$state[count] <- find.state(lower.CI[1], upper.CI[1]);
+          out$indices[count] <- out$indices[count-1] + index - 1;
        }
     }
     return(out);   	   	  		
