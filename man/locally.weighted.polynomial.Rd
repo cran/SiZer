@@ -4,8 +4,14 @@
 \alias{locally.weighted.polynomial}
 \title{Smoothes the given bivariate data using kernel regression.}
 \usage{
-locally.weighted.polynomial(x, y, h = NA, x.grid = NA, degree = 1,
-  kernel.type = "Normal")
+locally.weighted.polynomial(
+  x,
+  y,
+  h = NA,
+  x.grid = NA,
+  degree = 1,
+  kernel.type = "Normal"
+)
 }
 \arguments{
 \item{x}{Vector of data for the independent variable}

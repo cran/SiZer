@@ -15,7 +15,7 @@ Using SiZer to detect thresholds in ecological data. Frontiers in Ecology and
 the Environment 7:190-195.
 }
 \usage{
-Arkansas
+data(Arkansas, package='SiZer')
 }
 \description{
 A time series of 16 years (5 replicates per year) of mayfly 

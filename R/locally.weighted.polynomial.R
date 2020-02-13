@@ -107,25 +107,33 @@ locally.weighted.polynomial <- function(x, y, h=NA, x.grid=NA, degree=1, kernel.
 			X <- cbind(X, (x-x.star)^i );
 		}
      
-     # find the weight vector
-     w <- kernel.h(x-x.star, h, type=kernel.type);
-     w2 <- w^2;
-     XtW  <- t( apply(X,2,function(x){x*w}) );           # XtW <- t(X) %*% diag(w)   computed faster.  :) 
-     XtW2 <- t( apply(X,2,function(x){x*w2}) );          # XtW2 <- t(X) %*% diag(w^2) 
-     XtWXinv <- try( solve( XtW %*% X ), silent=TRUE );
-     if( class(XtWXinv) == 'try-error' ){            # inverse failed!  Could be any of a 
-     		out$Beta[, count] <- rep(NA, degree+1);      # bunch of legitimate reasons such 
-        unscaled.var[, count] <- rep(NA, degree+1);  # as a really small bandwidth.  So just 
-                                                     # record NAs and don't throw any warnings or errors.   
-     }else{
-     		beta <- XtWXinv %*% XtW %*% y;
-        out$Beta[,count] <- beta;
-        unscaled.var[,count] <- diag(XtWXinv %*% XtW2%*%X %*% t(XtWXinv));         
-                                                 # Var(Beta_j) = ((XtWX)^{-1}(XtW2X)(XtWX)^-1)[j,j] * 
-                                                 #                Var(Y|X=x.star) 
-                                                 # but we don't know
-     }                                           # Var(Y|X) yet so just store the diagonal terms.
-     count <- count+1;
+		# find the weight vector
+		w <- kernel.h(x-x.star, h, type=kernel.type);
+		w2 <- w^2;
+		XtW  <- t( apply(X,2,function(x){x*w}) );           # XtW <- t(X) %*% diag(w)   computed faster.  :) 
+		XtW2 <- t( apply(X,2,function(x){x*w2}) );          # XtW2 <- t(X) %*% diag(w^2) 
+		
+    # XtWXinv <- try( solve( XtW %*% X ), silent=TRUE );  
+		# if( class(XtWXinv) == 'try-error' ){            # inverse failed!  Could be any of a 
+		
+		# the R command class(XtWXinv) is not longer allowed and so I need to do the error catching 
+		# more intelligently. I think the solution is to use tryCatch and force the output in the error case to
+		# be something that I can identify using an is.XXXX() function.
+		XtWXinv <- tryCatch(solve( XtW %*% X ),
+		                    error=function(e){NULL})
+		if( is.null(XtWXinv) ){                        # inverse failed! There could be any of a
+		  out$Beta[, count] <- rep(NA, degree+1);      # bunch of legitimate reasons such 
+		  unscaled.var[, count] <- rep(NA, degree+1);  # as a really small bandwidth.  So just 
+		  # record NAs and don't throw any warnings or errors.   
+		}else{
+		  beta <- XtWXinv %*% XtW %*% y;
+		  out$Beta[,count] <- beta;
+		  unscaled.var[,count] <- diag(XtWXinv %*% XtW2%*%X %*% t(XtWXinv));         
+		  # Var(Beta_j) = ((XtWX)^{-1}(XtW2X)(XtWX)^-1)[j,j] * 
+		  #                Var(Y|X=x.star) 
+		  # but we don't know
+		}                                           # Var(Y|X) yet so just store the diagonal terms.
+		count <- count+1;
   } 
 
 	# At this point we have calculated the Beta coefficients at each grid point.  Now we need the 

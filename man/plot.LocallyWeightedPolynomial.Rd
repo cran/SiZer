@@ -4,8 +4,15 @@
 \alias{plot.LocallyWeightedPolynomial}
 \title{Creates a plot of an object created by \code{locally.weighted.polynomial}.}
 \usage{
-\method{plot}{LocallyWeightedPolynomial}(x, derv = 0, CI.method = 2,
-  alpha = 0.05, use.ess = TRUE, draw.points = TRUE, ...)
+\method{plot}{LocallyWeightedPolynomial}(
+  x,
+  derv = 0,
+  CI.method = 2,
+  alpha = 0.05,
+  use.ess = TRUE,
+  draw.points = TRUE,
+  ...
+)
 }
 \arguments{
 \item{x}{LocallyWeightedPolynomial object}

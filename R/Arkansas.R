@@ -10,6 +10,8 @@
 #'   \item{sqrt.mayflies}{The Square root of observed abundance.}
 #' }
 #' 
+#' @usage data(Arkansas, package='SiZer')
+#' 
 #' @source Sonderegger, D.L., Wang, H., Clements, W.H., and Noon, B.R. 2009. 
 #' Using SiZer to detect thresholds in ecological data. Frontiers in Ecology and 
 #' the Environment 7:190-195.

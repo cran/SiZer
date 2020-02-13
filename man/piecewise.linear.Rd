@@ -4,8 +4,14 @@
 \alias{piecewise.linear}
 \title{Creates a piecewise linear model}
 \usage{
-piecewise.linear(x, y, middle = 1, CI = FALSE, bootstrap.samples = 1000,
-  sig.level = 0.05)
+piecewise.linear(
+  x,
+  y,
+  middle = 1,
+  CI = FALSE,
+  bootstrap.samples = 1000,
+  sig.level = 0.05
+)
 }
 \arguments{
 \item{x}{Vector of data for the x-axis.}
