@@ -4,7 +4,16 @@
 \alias{SiZer}
 \title{Calculate SiZer Map}
 \usage{
-SiZer(x, y, h=NA, x.grid=NA, degree=NA, derv=1, grid.length=41)
+SiZer(
+  x,
+  y,
+  h = NA,
+  x.grid = NA,
+  degree = NA,
+  derv = 1,
+  grid.length = 41,
+  quiet = TRUE
+)
 }
 \arguments{
 \item{x}{data vector for the independent axis}
@@ -27,6 +36,8 @@ This must be greater than or equal to \code{derv}.}
 
 \item{grid.length}{The default length of the \code{h.grid} or \code{x.grid} 
 if the length of either is not given.}
+
+\item{quiet}{Should diagnostic messages be suppressed? Defaults to TRUE.}
 }
 \value{
 Returns list object of type SiZer which has the following components:
@@ -59,6 +70,7 @@ plot(x,y)
 # Calculate the SiZer map for the first derivative
 SiZer.1 <- SiZer(x, y, h=c(.5,10), degree=1, derv=1, grid.length=21)
 plot(SiZer.1)
+plot(SiZer.1, ggplot2=TRUE)
 
 # Calculate the SiZer map for the second derivative
 SiZer.2 <- SiZer(x, y, h=c(.5,10), degree=2, derv=2, grid.length=21);
